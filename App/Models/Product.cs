@@ -14,5 +14,5 @@ public class Product {
     [RegularExpression(@"^\d+(\.\d{1,2})?$")]
     public decimal Price { get; set; }
     
-    public AvaloniaList<OrderProduct>? Orders { get; set; }
+    public AvaloniaList<OrderedProduct>? Orders { get; set; }
 }

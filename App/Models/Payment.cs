@@ -18,8 +18,5 @@ public class Payment {
 
     [NotNull]
     [Required]
-    public Customer? Customer { get; set; } = null;
-    [NotNull]
-    [Required]
     public Order? Order { get; set; } = null;
 }

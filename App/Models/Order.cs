@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using Avalonia.Collections;
 
@@ -11,9 +12,12 @@ public class Order {
     public string Name { get; set; } = string.Empty;
 
     [Required]
-    [Range(0, double.MaxValue)]
-    [RegularExpression(@"^\d+(\.\d{1,2})?$")]
-    public decimal Price { get; set; }
+    public DateTimeOffset Date { get; set; } = DateTimeOffset.Now;
+    
+    [Required]
+    public TimeSpan Time { get; set; } = DateTimeOffset.Now.TimeOfDay;
 
-    public AvaloniaList<OrderProduct>? Products { get; set; }
+    [Required] public OrderStatus Status { get; set; }
+
+    public AvaloniaList<OrderedProduct>? Products { get; set; }
 }

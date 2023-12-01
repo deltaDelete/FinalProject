@@ -15,4 +15,8 @@ public class Customer {
 	[Required]
 	[RegularExpression("^(\\d+)$")]
 	public long Phone { get; set; }
+
+	[Required]
+	[RegularExpression("^(\\d+)$")]
+	public string Email { get; set; } = string.Empty;
 }

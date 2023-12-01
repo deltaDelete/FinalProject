@@ -11,7 +11,7 @@ public class AppDatabase : DbContext {
 
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
-    public DbSet<OrderProduct> OrdersProducts { get; set; } = null!;
+    public DbSet<OrderedProduct> OrdersProducts { get; set; } = null!;
     public DbSet<Customer> Customers { get; set; } = null!;
     public DbSet<Payment> Payments { get; set; } = null!;
 
@@ -30,11 +30,19 @@ public class AppDatabase : DbContext {
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<OrderProduct>()
+        modelBuilder.Entity<OrderedProduct>()
             .HasOne(x => x.Order)
             .WithMany(x => x.Products);
-        modelBuilder.Entity<OrderProduct>()
+        modelBuilder.Entity<OrderedProduct>()
             .HasOne(x => x.Product)
             .WithMany(x => x.Orders);
+
+        modelBuilder.Entity<OrderStatus>()
+            .HasData(
+                new OrderStatus("Оформлен"),
+                new OrderStatus("Ожидает оплату"),
+                new OrderStatus("Оплачен"),
+                new OrderStatus("Выполнен")
+            );
     }
 }

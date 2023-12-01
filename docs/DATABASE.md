@@ -31,7 +31,7 @@ erDiagram
     Payments {
         PaymentId INT PK
         OrderId INT FK
-        Amount DECIMAL
+        Total DECIMAL
         PaymentDate DATE
         PaymentTime TIME
     }
