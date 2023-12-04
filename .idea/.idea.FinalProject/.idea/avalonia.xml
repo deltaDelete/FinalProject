@@ -7,8 +7,11 @@
         <entry key="App/Assets/Styles/TextStyles.axaml" value="App/App.csproj" />
         <entry key="App/Assets/TextStyles.axaml" value="App/App.csproj" />
         <entry key="App/Views/MainWindow.axaml" value="App/App.csproj" />
+        <entry key="App/Views/Pages/CustomerPage.axaml" value="App/App.csproj" />
+        <entry key="App/Views/Pages/OrderPage.axaml" value="App/App.csproj" />
         <entry key="App/Views/Pages/ProductPage.axaml" value="App/App.csproj" />
         <entry key="App/Views/Pages/StartPage.axaml" value="App/App.csproj" />
+        <entry key="App/Views/Templates/TableBaseView.axaml" value="App/App.csproj" />
         <entry key="App/Views/Windows/MainWindow.axaml" value="App/App.csproj" />
       </map>
     </option>

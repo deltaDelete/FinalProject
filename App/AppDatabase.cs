@@ -15,6 +15,7 @@ public class AppDatabase : DbContext
     public DbSet<OrderedProduct> OrdersProducts { get; set; } = null!;
     public DbSet<Customer> Customers { get; set; } = null!;
     public DbSet<Payment> Payments { get; set; } = null!;
+    public DbSet<OrderStatus> OrderStatus { get; set; } = null!;
 
     /// <inheritdoc cref="DbContext"/>
     public AppDatabase()

@@ -28,6 +28,8 @@
             <fa:NavigationView.MenuItems>
                 <fa:NavigationViewItem Content="Стартовая страница" Tag="{x:Type pages:StartPage}" IsSelected="True" />
                 <fa:NavigationViewItem Content="Товары" Tag="{x:Type pages:ProductPage}" />
+                <fa:NavigationViewItem Content="Заказчики" Tag="{x:Type pages:CustomerPage}" />
+                <fa:NavigationViewItem Content="Заказы" Tag="{x:Type pages:OrderPage}" />
             </fa:NavigationView.MenuItems>
             <Grid>
                 <fa:Frame Name="NavFrame" />

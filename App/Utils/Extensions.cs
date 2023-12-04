@@ -3,12 +3,15 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using DynamicData.Binding;
 using FluentAvalonia.UI.Controls;
+using Newtonsoft.Json;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace App.Utils;
 
@@ -73,4 +76,24 @@ public static class Extensions {
         var primaryCommand = ReactiveUI.ReactiveCommand.CreateFromTask(action, isValid);
         dialog.PrimaryButtonCommand = primaryCommand;
     }
+    
+    /// <summary>
+    /// Создает глубокую копию
+    /// </summary>
+    /// <param name="source">Объект подлежащий копированию</param>
+    /// <typeparam name="T">Тип клона</typeparam>
+    /// <returns>Полная (наверное) копия объекта</returns>
+    public static T Clone<T>(this T source)
+    {
+        // var serialized = System.Text.Json.JsonSerializer.Serialize(source, new JsonSerializerOptions(JsonSerializerOptions.Default) {
+        //     MaxDepth = 3,
+        // });
+        var serialized = JsonConvert.SerializeObject(source, JsonSerializerSettings);
+        return System.Text.Json.JsonSerializer.Deserialize<T>(serialized)!;
+    }
+
+    private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings() {
+        MaxDepth = 3,
+        NullValueHandling = NullValueHandling.Include,
+    };
 }
