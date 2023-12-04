@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml;
 using App.Models;
@@ -29,7 +31,7 @@ using Splat;
 
 namespace App.Views.Pages;
 
-public partial class OrderPage : ReactiveUserControl<TableViewModelBase<Order>>, IEnableLogger {
+public partial class OrderPage : ReactiveUserControl<OrderViewModel>, IEnableLogger {
     public OrderPage() {
         InitializeComponent();
 
@@ -147,32 +149,6 @@ public partial class OrderPage : ReactiveUserControl<TableViewModelBase<Order>>,
         using var db = new AppDatabase();
         var statuses = db.OrderStatus.ToList();
         var customers = db.Customers.ToList();
-        // var products = db.Products.ToList();
-
-        // var productSelector = new ComboBox() {
-        //     PlaceholderText = "Товар",
-        //     ItemsSource = products,
-        //     DisplayMemberBinding = new Binding("Name"),
-        //     SelectedValueBinding = new Binding("Id"),
-        //     HorizontalAlignment = HorizontalAlignment.Stretch
-        // };
-        //
-        // var productsGrid = new DataGrid() {
-        //     MinHeight = 200,
-        //     [!DataGrid.ItemsSourceProperty] = new Binding("Products"),
-        //     Columns = {
-        //         new DataGridTextColumn() {
-        //             Header = "Товар",
-        //             Binding = new Binding("Product.Name"),
-        //             IsReadOnly = true
-        //         },
-        //
-        //         new DataGridTextColumn() {
-        //             Header = "Количество",
-        //             Binding = new Binding("Quantity"),
-        //         },
-        //     }
-        // };
 
         var stack = new StackPanel {
             Spacing = 15,
@@ -203,22 +179,83 @@ public partial class OrderPage : ReactiveUserControl<TableViewModelBase<Order>>,
                     SelectedValueBinding = new Binding("Id"),
                     HorizontalAlignment = HorizontalAlignment.Stretch
                 },
-                // new Button() {
-                //     Content = "Add",
-                //     Command = ReactiveCommand.Create((Product product) => {
-                //         this.Log().Debug(product);
-                //         item.Products?.Add(new OrderedProduct() {
-                //             Product = product,
-                //             Quantity = 1
-                //         });
-                //     }),
-                //     [!Button.CommandParameterProperty] = productSelector[!SelectingItemsControl.SelectedItemProperty]
-                // },
-                // productSelector,
-                // productsGrid
             }
         };
 
         return stack;
+    }
+}
+
+public class OrderViewModel : TableViewModelBase<Order> {
+    public ReactiveCommand<Order?, Unit> AddProductToOrderCommand { get; }
+
+    public OrderViewModel(Func<List<Order>> databaseGetter, Dictionary<int, Func<Order, object>> orderSelectors,
+                          Func<Order, object> defaultOrderSelector,
+                          Dictionary<int, Func<string, Func<Order, bool>>> filterSelectors,
+                          Func<string, Func<Order, bool>> defaultFilterSelector, Action<Order?> editItem,
+                          Func<Task> newItem, Action<Order?> removeItem) : base(
+        databaseGetter, orderSelectors, defaultOrderSelector, filterSelectors, defaultFilterSelector, editItem, newItem,
+        removeItem) {
+        var canAddProduct = this.WhenAnyValue(x => x.SelectedRow)
+                                .Select(x => x is not null);
+        AddProductToOrderCommand = ReactiveCommand.CreateFromTask<Order?>(AddProduct, canAddProduct);
+    }
+
+    private async Task AddProduct(Order? order) {
+        await using var db = new AppDatabase();
+        var products = db.Products.ToList();
+        await db.DisposeAsync();
+        var itemToEdit = new OrderedProduct() {
+            Order = order,
+            OrderId = order.Id,
+            Quantity = 1,
+        };
+        var stack = new StackPanel {
+            Spacing = 15,
+            Children = {
+                new ComboBox() {
+                    PlaceholderText = "Товар",
+                    ItemsSource = products,
+                    DisplayMemberBinding = new Binding("Name"),
+                    SelectedValueBinding = new Binding("Id"),
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    [!SelectingItemsControl.SelectedItemProperty] = new Binding("Product"),
+                    [!SelectingItemsControl.SelectedValueProperty] = new Binding("ProductId"),
+                },
+                new NumericUpDown() {
+                    Watermark = "Итого",
+                    ShowButtonSpinner = false,
+                    Minimum = 0,
+                    [!NumericUpDown.ValueProperty] = new Binding("Quantity"),
+                },
+            }
+        };
+
+        var dialog = new ContentDialog() {
+            Title = "Добавление записи",
+            PrimaryButtonText = "Создать",
+            CloseButtonText = "Закрыть",
+            DataContext = itemToEdit,
+            Content = stack,
+            DefaultButton = ContentDialogButton.Primary,
+            [!ContentDialog.PrimaryButtonCommandParameterProperty] = new Binding(".")
+        };
+
+        dialog.AddControlValidation<OrderedProduct>(stack.Children, async item => {
+            if (item is null) return;
+            item = item.Clone();
+            await using var db = new AppDatabase();
+            if (db.OrdersProducts.Local.All(x => x.Id != item.Id)) {
+                db.Attach(item);
+            }
+            db.OrdersProducts.Add(item);
+            await db.SaveChangesAsync();
+            AddOrderedProductLocal(item);
+        });
+        await dialog.ShowAsync();
+    }
+
+    void AddOrderedProductLocal(OrderedProduct orderedProduct) {
+        orderedProduct.Order.Products.Add(orderedProduct);
     }
 }

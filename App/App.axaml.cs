@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using App.ViewModels;
 using App.Views;
 using App.Views.Windows;
+using Microsoft.Extensions.Configuration;
 
 namespace App;
 
@@ -18,6 +19,10 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            
+            Configuration = new ConfigurationBuilder()
+                                           .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                                           .Build();
             desktop.MainWindow = new MainWindow
             {
                 DataContext = new MainWindowViewModel(),
@@ -26,4 +31,6 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
     }
+
+    public static IConfiguration? Configuration { get; protected set; }
 }

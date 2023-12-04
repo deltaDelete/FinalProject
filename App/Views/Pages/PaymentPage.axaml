@@ -1,21 +1,21 @@
-<rxui:ReactiveUserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:m="clr-namespace:App.Models"
-             xmlns:vm="clr-namespace:App.ViewModels"
-             xmlns:rxui="http://reactiveui.net"
-             xmlns:templates="clr-namespace:App.Views.Templates"
-             xmlns:pages="clr-namespace:App.Views.Pages"
-             x:DataType="pages:OrderViewModel"
-             x:TypeArguments="pages:OrderViewModel"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="App.Views.Pages.OrderPage">
+<rxui:ReactiveUserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:m="clr-namespace:App.Models"
+    xmlns:vm="clr-namespace:App.ViewModels"
+    xmlns:rxui="http://reactiveui.net"
+    xmlns:templates="clr-namespace:App.Views.Templates"
+    x:DataType="vm:TableViewModelBase"
+    x:TypeArguments="vm:TableViewModelBase"
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+    x:Class="App.Views.Pages.PaymentPage">
     <Design.DataContext>
-        <pages:OrderViewModel />
+        <vm:TableViewModelBase x:TypeArguments="m:Payment" />
     </Design.DataContext>
     
-     <DockPanel LastChildFill="True">
+    <DockPanel LastChildFill="True">
         <ScrollViewer HorizontalScrollBarVisibility="Auto" DockPanel.Dock="Top">
             <StackPanel Orientation="Horizontal" Spacing="5" Margin="8 16">
                 <TextBox MinWidth="256" Text="{Binding SearchQuery, Mode=TwoWay}" />
@@ -26,7 +26,6 @@
                 <Button Content="Изменить" Command="{Binding EditItemCommand}" />
                 <Button Content="Удалить" Command="{Binding RemoveItemCommand}" />
                 <Button Content="Обновить" Command="{Binding ReloadCommand}" />
-                <Button Content="Добавить товар" Command="{Binding AddProductToOrderCommand}" CommandParameter="{Binding SelectedRow}" />
             </StackPanel>
         </ScrollViewer>
         <StackPanel HorizontalAlignment="Center" DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="5"
@@ -60,8 +59,8 @@
                     <DataGridTextColumn Header="Код" Binding="{Binding Id}" />
                     <DataGridTextColumn Header="Дата" Binding="{Binding Date, StringFormat='dd.MM.yyyy'}" />
                     <DataGridTextColumn Header="Время" Binding="{Binding Time}" />
-                    <DataGridTextColumn Header="Заказчик" Binding="{Binding Customer.FullName}" />
-                    <DataGridTextColumn Header="Статус" Binding="{Binding Status.Name}" />
+                    <DataGridTextColumn Header="Заказ" Binding="{Binding Order.Id}" />
+                    <DataGridTextColumn Header="Итого" Binding="{Binding Total}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

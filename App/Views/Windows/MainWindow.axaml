@@ -12,7 +12,7 @@
     x:TypeArguments="vm:MainWindowViewModel"
     x:DataType="vm:MainWindowViewModel"
     Icon="/Assets/avalonia-logo.ico"
-    Title="App">
+    Title="СУП">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -30,6 +30,7 @@
                 <fa:NavigationViewItem Content="Товары" Tag="{x:Type pages:ProductPage}" />
                 <fa:NavigationViewItem Content="Заказчики" Tag="{x:Type pages:CustomerPage}" />
                 <fa:NavigationViewItem Content="Заказы" Tag="{x:Type pages:OrderPage}" />
+                <fa:NavigationViewItem Content="Платежи" Tag="{x:Type pages:PaymentPage}" />
             </fa:NavigationView.MenuItems>
             <Grid>
                 <fa:Frame Name="NavFrame" />

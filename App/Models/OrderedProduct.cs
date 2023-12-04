@@ -11,7 +11,7 @@ public class OrderedProduct
     public int Id { get; set; }
 
     [Required]
-    [JsonIgnore] 
+    [JsonProperty] 
     public Order? Order { get; set; }
     [Required]
     [JsonProperty] 

@@ -95,5 +95,6 @@ public static class Extensions {
     private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings() {
         MaxDepth = 3,
         NullValueHandling = NullValueHandling.Include,
+        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
     };
 }
