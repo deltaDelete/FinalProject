@@ -11,7 +11,7 @@ public class Product {
 
     [Required]
     [Range(0, double.MaxValue)]
-    [RegularExpression(@"^\d+(\.\d{1,2})?$")]
+    [RegularExpression(@"^\d+((\.|,)\d{1,2})?$")]
     public decimal Price { get; set; }
     
     public AvaloniaList<OrderedProduct>? Orders { get; set; }

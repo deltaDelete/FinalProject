@@ -27,6 +27,7 @@
                            SelectionChanged="NavView_OnSelectionChanged">
             <fa:NavigationView.MenuItems>
                 <fa:NavigationViewItem Content="Стартовая страница" Tag="{x:Type pages:StartPage}" IsSelected="True" />
+                <fa:NavigationViewItem Content="Товары" Tag="{x:Type pages:ProductPage}" />
             </fa:NavigationView.MenuItems>
             <Grid>
                 <fa:Frame Name="NavFrame" />

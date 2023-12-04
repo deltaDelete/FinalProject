@@ -2,11 +2,12 @@ using App.Models;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
-namespace App; 
+namespace App;
 
-public class AppDatabase : DbContext {
+public class AppDatabase : DbContext
+{
     private static readonly string ConnectionString =
-        "server=localhost;user=dev;password=devPassword;database=pr7";
+        "server=localhost;user=dev;password=devPassword;database=project3";
     // "server=10.10.1.24;user=user_01;password=user01pro;database=pro1_2";
 
     public DbSet<Product> Products { get; set; } = null!;
@@ -16,18 +17,21 @@ public class AppDatabase : DbContext {
     public DbSet<Payment> Payments { get; set; } = null!;
 
     /// <inheritdoc cref="DbContext"/>
-    public AppDatabase() {
+    public AppDatabase()
+    {
         Database.EnsureCreated();
     }
-    
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
         optionsBuilder.UseMySql(
             ConnectionString,
             ServerVersion.AutoDetect(ConnectionString)
         );
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<OrderedProduct>()
@@ -39,10 +43,14 @@ public class AppDatabase : DbContext {
 
         modelBuilder.Entity<OrderStatus>()
             .HasData(
-                new OrderStatus("Оформлен"),
-                new OrderStatus("Ожидает оплату"),
-                new OrderStatus("Оплачен"),
-                new OrderStatus("Выполнен")
+                new OrderStatus { Id = 1, Name = "Оформлен" },
+                new OrderStatus { Id = 2, Name = "Ожидает оплату" },
+                new OrderStatus { Id = 3, Name = "Оплачен" },
+                new OrderStatus { Id = 4, Name = "Выполнен" }
             );
+
+        modelBuilder.Entity<OrderStatus>()
+            .Property(x => x.Id)
+            .ValueGeneratedOnAdd();
     }
 }
