@@ -88,14 +88,14 @@ public class TableViewModelBase<T> : TableViewModelBase, IActivatableViewModel {
 
         // TODO: решить траблы переделать способ пагинации
         _pages = this.WhenAnyValue(x => x.Filtered)
-            .Select(x => {
-                return x.Select((item, index) => (index, item))
-                    .GroupBy(item => item.index / Take)
-                    .Select(grouping => grouping.Select(v => v.item).ToList())
-                    .ToList();
-            }).ToProperty(this, x => x.Pages);
+                     .Select(x => {
+                         return x.Select((item, index) => (index, item))
+                                 .GroupBy(item => item.index / Take)
+                                 .Select(grouping => grouping.Select(v => v.item).ToList())
+                                 .ToList();
+                     }).ToProperty(this, x => x.Pages);
         _totalPages = this.WhenAnyValue(x => x.Pages)
-            .Select(x => x.Count).ToProperty(this, x => x.TotalPages, () => 1);
+                          .Select(x => x.Count).ToProperty(this, x => x.TotalPages, () => 1);
 
         var canTakeNext = this.WhenAnyValue(
             x => x.CurrentPage,
@@ -123,9 +123,9 @@ public class TableViewModelBase<T> : TableViewModelBase, IActivatableViewModel {
         TakePrevCommand = ReactiveCommand.Create(TakePrev, canTakeBack);
         TakeFirstCommand = ReactiveCommand.Create(TakeFirst, canTakeBack);
         TakeLastCommand = ReactiveCommand.Create(TakeLast, canTakeLast);
-        EditItemCommand = ReactiveCommand.Create(() => _editItem(SelectedRow)); //, canEdit);
+        EditItemCommand = ReactiveCommand.Create(() => _editItem(SelectedRow));     //, canEdit);
         RemoveItemCommand = ReactiveCommand.Create(() => _removeItem(SelectedRow)); // , canEdit);
-        NewItemCommand = ReactiveCommand.CreateFromTask(_newItem); //, canInsert);
+        NewItemCommand = ReactiveCommand.CreateFromTask(_newItem);                  //, canInsert);
         ReloadCommand = ReactiveCommand.Create(GetDataFromDbOnThread);
 
         GetDataFromDbOnThread();
@@ -141,22 +141,40 @@ public class TableViewModelBase<T> : TableViewModelBase, IActivatableViewModel {
         ).Subscribe(_ => TakeFirst());
     }
 
+    public void Search(string query, int column, bool isDescending) {
+        OnSearchChanged((query, column, isDescending));
+    }
+
     private void OnSearchChanged((string query, int column, bool isDescending) tuple) {
         if (_itemsFull is null) {
             return;
         }
 
         var filtered = string.IsNullOrWhiteSpace(tuple.query)
-            ? _itemsFull
-            : _itemsFull.Where(
-                _filterSelectors.GetValueOrDefault(tuple.column, _defaultFilterSelector)(tuple.query.ToLower()));
+                           ? _itemsFull
+                           : _itemsFull.Where(
+                               _filterSelectors.GetValueOrDefault(tuple.column, _defaultFilterSelector)(
+                                   tuple.query.ToLower()));
 
         Filtered = tuple.isDescending switch {
             true => filtered.OrderByDescending(_orderSelectors.GetValueOrDefault(tuple.column, _defaultOrderSelector))
-                .ToList(),
+                            .ToList(),
             false => filtered.OrderBy(_orderSelectors.GetValueOrDefault(tuple.column, _defaultOrderSelector))
-                .ToList(),
+                             .ToList(),
         };
+    }
+
+    public void GetDataFromDbSynchronous() {
+        IsLoading = true;
+        if (_databaseGetter is null) {
+            throw new NullReferenceException();
+        }
+
+        var list = _databaseGetter.Invoke();
+        _itemsFull = list ?? new List<T>();
+        Filtered = _itemsFull;
+        SearchQuery = string.Empty;
+        IsLoading = false;
     }
 
     private async void GetDataFromDbOnThread() {
@@ -208,24 +226,24 @@ public class TableViewModelBase<T> : TableViewModelBase, IActivatableViewModel {
         }
     }
 
-    protected void TakeNext() {
+    public void TakeNext() {
         if (CurrentPage + 1 > TotalPages) return;
         Items = new(Pages[CurrentPage - 1]);
         CurrentPage++;
     }
 
-    protected void TakePrev() {
+    public void TakePrev() {
         if (CurrentPage - 1 > TotalPages) return;
         Items = new(Pages[CurrentPage + 1]);
         CurrentPage--;
     }
 
-    protected void TakeFirst() {
+    public void TakeFirst() {
         Items = new(Pages.FirstOrDefault(new List<T>()));
         CurrentPage = 1;
     }
 
-    protected void TakeLast() {
+    public void TakeLast() {
         Items = new(Pages.LastOrDefault(new List<T>()));
         CurrentPage = TotalPages;
     }
